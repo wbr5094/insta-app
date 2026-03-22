@@ -1,17 +1,8 @@
-/**
- * Copyright 2026 wbr5094
- * @license Apache-2.0, see LICENSE for full text.
- */
 import { LitElement, html, css } from "lit";
 import { DDDSuper } from "@haxtheweb/d-d-d/d-d-d.js";
 import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
 
-/**
- * `insta-app`
- * 
- * @demo index.html
- * @element insta-app
- */
+
 export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
 
   static get tag() {
@@ -39,6 +30,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     return {
       ...super.properties,
       title: { type: String },
+      currentIndex: {type: Number},
     };
   }
 
@@ -57,7 +49,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         padding: var(--ddd-spacing-4);
       }
       h3 span {
-        font-size: var(--insta-app-label-font-size, var(--ddd-font-size-s));
+        font-size: var(--play-list-project-label-font-size, var(--ddd-font-size-s));
       }
     `];
   }
@@ -67,17 +59,68 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     return html`
 <div class="wrapper">
   <h3><span>${this.t.title}:</span> ${this.title}</h3>
-  <slot></slot>
+<playlist-arrow
+  .currentIndex="${this.currentIndex}"
+  .total="${this.slides ? this.slides.length : 0}"
+  @prev-clicked="${this.prev}"
+  @next-clicked="${this.next}">
+</playlist-arrow>  
+<div class="slides">
+  <slot @slotchange="${this._handleSlotChange}"></slot>
+</div>
+<playlist-indicator @dot-selected="${this._handleDotSelected}"
+    .total="${this.slides ? this.slides.length : 0}"
+    .currentIndex="${this.currentIndex}">
+  </playlist-indicator>
 </div>`;
   }
+  next() {
+  if (this.currentIndex < this.slides.length - 1) {
+    this.currentIndex++;
+    this._updateSlides();
+  }
+}
 
+_handleSlotChange(e) {
+  this.slides = e.target.assignedElements({ flatten: true });
+  this._updateSlides();
+}
+
+_handleDotSelected(e) {
+  this.currentIndex = e.detail.index;
+  this._updateSlides();
+}
+
+
+prev() {
+  if (this.currentIndex > 0) {
+    this.currentIndex--;
+    this._updateSlides();
+  }
+}
+
+firstUpdated() {
+  this._updateSlides();
+}
+
+_updateSlides() {
+  this.slides.forEach((slide, i) => {
+    slide.style.display = i === this.currentIndex ? "block" : "none";
+  });
+  const indexChange = new CustomEvent("play-list-index-changed", {
+  composed: true,
+  bubbles: true,
+  detail: {
+    index: this.currentIndex
+  },
+});
+this.dispatchEvent(indexChange);  
+
+}
+
+}
   /**
    * haxProperties integration via file reference
    */
-  static get haxProperties() {
-    return new URL(`./lib/${this.tag}.haxProperties.json`, import.meta.url)
-      .href;
-  }
-}
 
 globalThis.customElements.define(InstaApp.tag, InstaApp);
