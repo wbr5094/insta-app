@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="Description" content="Demonstration for insta-app">
 
+  <script type="module" src="./insta-card.js"></script>
+  <script type="module" src="./slide-arrow.js"></script>
+  <script type="module" src="./slide-indicator.js"></script>
+  <script type="module" src="./insta-app.js"></script>
+
   <style>
     :root, html, body {
       margin: var(--ddd-spacing-0);
@@ -23,42 +28,27 @@
     insta-app:hover {
       box-shadow: var(--ddd-boxShadow-sm);
     }
-    #example {
-      --insta-app-font-size: var(--ddd-font-size-l);
-      background-color: var(--ddd-accent-2);
-      color: var(--ddd-primary-17);
-    }
   </style>
   <title>insta-app</title>
 </head>
-
-<!DOCTYPE html>
-<head>
-  <script type="module" src="./insta-card.js"></script>
-  <style>
-    img {
-      width: 200px;
-      height: 200px;
-    }
-  </style>
-</head>
-<body>
-</body>
 
 <body>
   <div id="demo">
     <h1>insta-app</h1>
     <!-- this is going to do whatever the tag's defaults are -->
-    <insta-card></insta-card>
     <h2>Default</h2>
-    <insta-app></insta-app>
-    <h2>Slot usage</h2>
-    <insta-app data-accent="2" data-primary="17"><div>Sample slot content</div></insta-app>
-    <h2>Property usage</h2>
-    <insta-app id="example" title="Sample property title"></insta-app>
+    <insta-app>
+      <insta-card> </insta-card>
+      <insta-card> </insta-card>
+      <insta-card> </insta-card>
+      <insta-card> </insta-card>
+      <insta-card> </insta-card>
+      <insta-card> </insta-card>
+      <insta-card> </insta-card>
+      <insta-card> </insta-card>
+    </insta-app>
   </div>
   <script type="module" src="./insta-app.js"></script>
-
   <!-- Take HAX, the Web and you further down the rabbit hole -->
 </body>
 </html>

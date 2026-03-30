@@ -4,15 +4,25 @@ export class InstaCard extends LitElement {
   static styles = css`
     .card {
       width: 300px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      padding: 10px;
-      text-align: center;
+      border: var(--ddd-border-md);
+      border-radius: var(--ddd-radius-lg);
+      padding: var(--ddd-spacing-3);
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--ddd-spacing-2);
     }
 
     img {
       width: 100%;
-      border-radius: 10px;
+      max-width: 250px;
+      border-radius: var(--ddd-radius-md);
+      display: block;
+    }
+
+    a {
+      color: var(--ddd-theme-primary);
     }
   `;
 

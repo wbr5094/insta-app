@@ -12,11 +12,14 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
   constructor() {
     super();
     this.title = "";
-    this.t = this.t || {};
+    this.currentIndex = 0;
+    this.slides = [];
+    
     this.t = {
       ...this.t,
       title: "Title",
     };
+
     this.registerLocalization({
       context: this,
       localesPath:
@@ -45,52 +48,60 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         font-family: var(--ddd-font-navigation);
       }
       .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--ddd-spacing-2);
         margin: var(--ddd-spacing-2);
         padding: var(--ddd-spacing-4);
       }
-      h3 span {
-        font-size: var(--play-list-project-label-font-size, var(--ddd-font-size-s));
+      .slides {
+        position: relative;
+        display: flex;
+        justify-content: center;
       }
     `];
   }
 
   // Lit render the HTML
   render() {
-    return html`
-<div class="wrapper">
-  <h3><span>${this.t.title}:</span> ${this.title}</h3>
-<playlist-arrow
-  .currentIndex="${this.currentIndex}"
-  .total="${this.slides ? this.slides.length : 0}"
-  @prev-clicked="${this.prev}"
-  @next-clicked="${this.next}">
-</playlist-arrow>  
-<div class="slides">
-  <slot @slotchange="${this._handleSlotChange}"></slot>
-</div>
-<playlist-indicator @dot-selected="${this._handleDotSelected}"
-    .total="${this.slides ? this.slides.length : 0}"
-    .currentIndex="${this.currentIndex}">
-  </playlist-indicator>
-</div>`;
+  return html`
+    <div class="wrapper">
+      <h3><span>${this.t.title}:</span> ${this.title}</h3>
+
+      <playlist-arrow
+        .currentIndex="${this.currentIndex}"
+        .total="${this.slides.length}"
+        @prev-clicked="${this.prev}"
+        @next-clicked="${this.next}">
+      </playlist-arrow>
+
+      <div class="slides">
+        <slot @slotchange="${this._handleSlotChange}"></slot>
+        </div>
+
+        <playlist-indicator
+          .total="${this.slides.length}"
+          .currentIndex="${this.currentIndex}"
+          @dot-selected="${this._handleDotSelected}">
+        </playlist-indicator>
+      </div>
+    `;
   }
+
+_handleSlotChange(e) {
+  this.slides = e.target.assignedElements({ flatten: true });
+  this.currentIndex = 0;
+  this._updateSlides();}
+
+
+
   next() {
   if (this.currentIndex < this.slides.length - 1) {
     this.currentIndex++;
     this._updateSlides();
   }
 }
-
-_handleSlotChange(e) {
-  this.slides = e.target.assignedElements({ flatten: true });
-  this._updateSlides();
-}
-
-_handleDotSelected(e) {
-  this.currentIndex = e.detail.index;
-  this._updateSlides();
-}
-
 
 prev() {
   if (this.currentIndex > 0) {
@@ -99,28 +110,28 @@ prev() {
   }
 }
 
+_handleDotSelected(e) {
+  this.currentIndex = e.detail.index;
+  this._updateSlides();
+}
+
 firstUpdated() {
   this._updateSlides();
 }
 
 _updateSlides() {
-  this.slides.forEach((slide, i) => {
-    slide.style.display = i === this.currentIndex ? "block" : "none";
-  });
-  const indexChange = new CustomEvent("play-list-index-changed", {
-  composed: true,
-  bubbles: true,
-  detail: {
-    index: this.currentIndex
-  },
-});
-this.dispatchEvent(indexChange);  
+    if (!this.slides || this.slides.length === 0) return;
 
-}
+    this.slides.forEach((slide, i) => {
+      slide.style.display = i === this.currentIndex ? "block" : "none";
+    });
 
+    this.dispatchEvent(new CustomEvent("play-list-index-changed", {
+      bubbles: true,
+      composed: true,
+      detail: { index: this.currentIndex },
+    }));
+  }
 }
-  /**
-   * haxProperties integration via file reference
-   */
 
 globalThis.customElements.define(InstaApp.tag, InstaApp);
