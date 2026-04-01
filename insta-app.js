@@ -2,7 +2,6 @@ import { LitElement, html, css } from "lit";
 import { DDDSuper } from "@haxtheweb/d-d-d/d-d-d.js";
 import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
 
-
 export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
 
   static get tag() {
@@ -11,40 +10,25 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
 
   constructor() {
     super();
-    this.title = "";
     this.currentIndex = 0;
-    this.slides = [];
-    
-    this.t = {
-      ...this.t,
-      title: "Title",
-    };
-
-    this.registerLocalization({
-      context: this,
-      localesPath:
-        new URL("./locales/insta-app.ar.json", import.meta.url).href +
-        "/../",
-    });
+    this.data = [];
+    this.author = null;
   }
 
-  // Lit reactive properties
   static get properties() {
     return {
       ...super.properties,
-      title: { type: String },
       currentIndex: {type: Number},
+      data: {type: Array},
+      author: {type: Object}
     };
   }
 
-  // Lit scoped styles
   static get styles() {
     return [super.styles,
     css`
       :host {
         display: block;
-        color: var(--ddd-theme-primary);
-        background-color: var(--ddd-theme-accent);
         font-family: var(--ddd-font-navigation);
       }
       .wrapper {
@@ -52,36 +36,114 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         flex-direction: column;
         align-items: center;
         gap: var(--ddd-spacing-2);
-        margin: var(--ddd-spacing-2);
-        padding: var(--ddd-spacing-4);
       }
-      .slides {
+
+      .slider {
         position: relative;
         display: flex;
+        align-items: center;
         justify-content: center;
+      }
+
+      .arrow {
+        position: absolute;
+        top: 50%;
+        background: var(--ddd-theme-default-beaverBlue);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+      }
+
+      .left {
+        left: -50px;
+      }
+
+      .right {
+        right: -50px;
+      }
+
+      .arrow:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
       }
     `];
   }
 
-  // Lit render the HTML
+  connectedCallback() {
+    super.connectedCallback();
+    this.loadData();
+
+    const params = new URLSearchParams(window.location.search);
+    const index = parseInt(params.get("activeIndex"));
+    if (!isNaN(index)) {
+      this.currentIndex = index;
+    }
+  }
+
+  async loadData() {
+    const res = await fetch("./data.json");
+    const json = await res.json();
+    this.data = json.images;
+    this.author = json.author;
+  }
+
+   updateURL() {
+    const url = new URL(window.location);
+    url.searchParams.set("activeIndex", this.currentIndex);
+    window.history.replaceState({}, "", url);
+  }
+
+  next() {
+  if (this.currentIndex < this.data.length - 1) {
+    this.currentIndex++;
+    this.updateURL();
+  }
+}
+
+prev() {
+  if (this.currentIndex > 0) {
+    this.currentIndex--;
+    this.updateURL();
+  }
+}
+
+_handleDotSelected(e) {
+  this.currentIndex = e.detail.index;
+  this.updateURL();
+}
+
   render() {
   return html`
     <div class="wrapper">
-      <h3><span>${this.t.title}:</span> ${this.title}</h3>
+      <div class = "slider">
+      <button 
+      class="arrow left"
+      ?disabled="${this.currentIndex === 0}"
+      @click="${this.prev}">
+       ◀
+      </button>
 
-      <playlist-arrow
-        .currentIndex="${this.currentIndex}"
-        .total="${this.slides.length}"
-        @prev-clicked="${this.prev}"
-        @next-clicked="${this.next}">
-      </playlist-arrow>
+    ${this.data.length > 0 ? html`
+      <insta-card
+        .image="${this.data[this.currentIndex].fullSize}"
+        .title="${this.data[this.currentIndex].name}"
+        .description="${this.data[this.currentIndex].description}"
+        .author="${this.author}">
+        </insta-card>
+      ` : ""}
 
-      <div class="slides">
-        <slot @slotchange="${this._handleSlotChange}"></slot>
-        </div>
-
+      <button 
+      class="arrow right"
+      ?disabled="${this.currentIndex === this.data.length - 1}"
+      @click="${this.next}">
+      ▶
+      </button>
+      </div>
         <playlist-indicator
-          .total="${this.slides.length}"
+          .total="${this.data.length}"
           .currentIndex="${this.currentIndex}"
           @dot-selected="${this._handleDotSelected}">
         </playlist-indicator>
@@ -89,49 +151,6 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     `;
   }
 
-_handleSlotChange(e) {
-  this.slides = e.target.assignedElements({ flatten: true });
-  this.currentIndex = 0;
-  this._updateSlides();}
-
-
-
-  next() {
-  if (this.currentIndex < this.slides.length - 1) {
-    this.currentIndex++;
-    this._updateSlides();
-  }
-}
-
-prev() {
-  if (this.currentIndex > 0) {
-    this.currentIndex--;
-    this._updateSlides();
-  }
-}
-
-_handleDotSelected(e) {
-  this.currentIndex = e.detail.index;
-  this._updateSlides();
-}
-
-firstUpdated() {
-  this._updateSlides();
-}
-
-_updateSlides() {
-    if (!this.slides || this.slides.length === 0) return;
-
-    this.slides.forEach((slide, i) => {
-      slide.style.display = i === this.currentIndex ? "block" : "none";
-    });
-
-    this.dispatchEvent(new CustomEvent("play-list-index-changed", {
-      bubbles: true,
-      composed: true,
-      detail: { index: this.currentIndex },
-    }));
-  }
 }
 
 globalThis.customElements.define(InstaApp.tag, InstaApp);

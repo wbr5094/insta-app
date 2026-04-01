@@ -1,64 +1,95 @@
 import { html, css, LitElement } from 'lit';
 
 export class InstaCard extends LitElement {
-  static styles = css`
-    .card {
-      width: 300px;
-      border: var(--ddd-border-md);
-      border-radius: var(--ddd-radius-lg);
-      padding: var(--ddd-spacing-3);
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--ddd-spacing-2);
-    }
-
-    img {
-      width: 100%;
-      max-width: 250px;
-      border-radius: var(--ddd-radius-md);
-      display: block;
-    }
-
-    a {
-      color: var(--ddd-theme-primary);
-    }
-  `;
-
   static properties = {
     image: { type: String },
-    link: { type: String }
+    title: { type: String },
+    description: { type: String },
+    author: {type: Object},
+    liked: {type: Boolean}
   };
 
   constructor() {
     super();
-    this.image = '';
-    this.link = '';
+    this.liked = false;
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.getFox();
+    const saved = localStorage.getItem(this.title);
+    this.liked = saved == "true";
   }
 
-  async getFox() {
-    const resp = await fetch("https://randomfox.ca/floof/");
-    const data = await resp.json();
-
-    this.image = data.image;
-    this.link = data.link;
+  toggleLike() {
+    this.liked = !this.lliked;
+    localStorage.setItem(this.title, this.liked);
   }
+
+  static styles = css`
+    .card {
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      justify-content: flex-start;
+    }
+
+    .author img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+    }
+
+    .author-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 8px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  `;
 
   render() {
     return html`
       <div class="card">
-        ${this.image ? html`<img src="${this.image}" alt="fox" />` : ''}
-        <p><a href="${this.link}" target="_blank">View Source</a></p>
-        <button @click="${this.getFox}">New Fox</button>
+
+        ${this.author ? html`
+          <div class="author">
+            <img src="${this.author.image}">
+          <div class="author-name">${this.author.name}</div>
+          </div>
+        ` : ""}
+
+        <img src="${this.image}" loading="lazy" />
+
+        <p><strong>${this.title}</strong></p>
+        <p>${this.description}</p>
+
+        <button @click="${this.toggleLike}">
+          ${this.liked ? "❤️" : "🤍"}
+        </button>
+
       </div>
     `;
   }
 }
 
-customElements.define('insta-card', InstaCard);
+customElements.define("insta-card", InstaCard);

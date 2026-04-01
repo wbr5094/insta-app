@@ -8,68 +8,63 @@ export class PlaylistIndicator extends DDDSuper(I18NMixin(LitElement)) {
     return "playlist-indicator";
   }
 
-  constructor() {
-    super();
-        this.total = 0;
-        this.currentIndex = 0;
-  }
-
   static get properties() {
     return {
-      ...super.properties,
       total: { type: Number },
       currentIndex: { type: Number },
     };
   }
 
+    constructor() {
+    super();
+        this.total = 0;
+        this.currentIndex = 0;
+  }
+
   static get styles() {
-    return [super.styles,
-    css`
-      :host {
-        display: block;
-      }
+    return css`
       .dots {
         display: flex;
         justify-content: center;
-        gap: var(--ddd-spacing-2);
-        padding: var(--ddd-spacing-2);
-        }
+        gap: 8px;
+        margin-top: 10px;
+      }
+
     .dot {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background-color: var(--ddd-theme-default-beaverBlue);
+    background-color: gray;
     opacity: 0.4;
     cursor: pointer;
     }
     .dot.active {
     opacity: 1;
+    background: blue;
     }
-        `];
+        `;
   }
 
   render() {
-    let dots = [];
-    for (let i = 0; i < this.total; i++) {
-      dots.push(html`
-<span 
-  class="dot ${i === this.currentIndex ? 'active' : ''}"
-  @click="${() => this._dotClicked(i)}">
-</span>        `);
-    }
     return html`
       <div class="dots">
-        ${dots}
-      </div>`;
+        ${Array.from({ length: this.total }, (_, i) => html`
+          <span 
+            class="dot ${i === this.currentIndex ? 'active' : ''}"
+            @click="${() => this._dotClicked(i)}">
+          </span>
+        `)}
+      </div>
+    `;
   }
-  _dotClicked(index) {
-  this.dispatchEvent(new CustomEvent("dot-selected", {
-    bubbles: true,
-    composed: true,
-    detail: { index }
-  }));
-}
 
+  _select(index) {
+    this.dispatchEvent(new CustomEvent("dot-selected", {
+      bubbles: true,
+      composed: true,
+      detail: { index }
+    }));
+  }
 }
 
 globalThis.customElements.define(PlaylistIndicator.tag, PlaylistIndicator);

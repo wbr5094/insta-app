@@ -5,7 +5,6 @@
   <base href="/">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="Description" content="Demonstration for insta-app">
 
   <script type="module" src="./insta-card.js"></script>
   <script type="module" src="./slide-arrow.js"></script>
@@ -16,39 +15,21 @@
     :root, html, body {
       margin: var(--ddd-spacing-0);
       padding: var(--ddd-spacing-0);
+      background-color: black;
     }
     #demo {
       margin: var(--ddd-spacing-2);
     }
     insta-app {
       margin: var(--ddd-spacing-2);
-      border: var(--ddd-border-md);
-      border-radius: var(--ddd-radius-lg);
-    }
-    insta-app:hover {
-      box-shadow: var(--ddd-boxShadow-sm);
-    }
+      }
   </style>
   <title>insta-app</title>
 </head>
 
 <body>
   <div id="demo">
-    <h1>insta-app</h1>
-    <!-- this is going to do whatever the tag's defaults are -->
-    <h2>Default</h2>
-    <insta-app>
-      <insta-card> </insta-card>
-      <insta-card> </insta-card>
-      <insta-card> </insta-card>
-      <insta-card> </insta-card>
-      <insta-card> </insta-card>
-      <insta-card> </insta-card>
-      <insta-card> </insta-card>
-      <insta-card> </insta-card>
-    </insta-app>
+    <insta-app></insta-app>
   </div>
-  <script type="module" src="./insta-app.js"></script>
-  <!-- Take HAX, the Web and you further down the rabbit hole -->
 </body>
 </html>

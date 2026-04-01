@@ -4,59 +4,38 @@ import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
 
 export class PlayListArrow extends DDDSuper(I18NMixin(LitElement)) {
 
-  static get tag() {
+  static tag() {
     return "playlist-arrow";
   }
-
-  constructor() {
-    super();
-  }
-
-  // Lit reactive properties
-static get properties() {
-  return {
-    ...super.properties,
+  
+  static get properties() {
+    return {
     currentIndex: { type: Number },
     total: { type: Number }
   };
 }
-  // Lit scoped styles
-static get styles() {
-  return [super.styles, css`
-    :host {
-      display: block;
-    }
 
-    .wrapper {
-      display: flex;
-      justify-content: center;
-      gap: var(--ddd-spacing-2);
-      margin-top: var(--ddd-spacing-2);
-    }
+  static get styles() {
+    return css`
+      :host {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
 
-    button {
-      background-color: var(--ddd-theme-default-beaverBlue);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      opacity: 0.8;
-    }
-  `];
-}
-  // Lit render the HTML
+      button {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background: blue;
+        color: white;
+        cursor: pointer;
+      }
+    `;
+  }
   render() {
   return html`
-    <div class="wrapper">
       <button 
         ?disabled="${this.currentIndex === 0}"
         @click="${this._prev}">
@@ -71,6 +50,7 @@ static get styles() {
     </div>
   `;
 }
+
 _prev() {
   this.dispatchEvent(new CustomEvent('prev-clicked', {
     bubbles: true,
