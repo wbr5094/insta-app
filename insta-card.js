@@ -31,7 +31,7 @@ export class InstaCard extends LitElement {
       border: 1px solid #ccc;
       border-radius: 12px;
       padding: 10px;
-      text-align: center;
+      text-align: left;
     }
 
     img {
