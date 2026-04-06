@@ -85,7 +85,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
   }
 
   async loadData() {
-    const res = await fetch("/data.json");
+    const res = await fetch("/api/data");
     const json = await res.json();
     this.data = json.images;
     this.author = json.author;
