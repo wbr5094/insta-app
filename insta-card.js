@@ -6,7 +6,8 @@ export class InstaCard extends LitElement {
     title: { type: String },
     description: { type: String },
     author: {type: Object},
-    liked: {type: Boolean}
+    liked: {type: Boolean},
+    id: {type: Number}
   };
 
   constructor() {
@@ -14,24 +15,33 @@ export class InstaCard extends LitElement {
     this.liked = false;
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    const saved = localStorage.getItem(this.title);
-    this.liked = saved == "true";
+  updated(changedProps) {
+    if (changedProps.has("id")) {
+      const saved = localStorage.getItem("like-" + this.id);
+      this.liked = saved == "true";
+    }
   }
-
   toggleLike() {
-    this.liked = !this.lliked;
-    localStorage.setItem(this.title, this.liked);
+    this.liked = !this.liked;
+    localStorage.setItem("like-" + this.id, this.liked);
   }
 
   static styles = css`
     .card {
-      width: 300px;
+      width: 500px;
+      height: 700px;
       border: 1px solid #ccc;
-      border-radius: 12px;
-      padding: 10px;
-      text-align: left;
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .like-row {
+      margin-top: auto;
+      display: flex;
+      justify-content: flex-start;
     }
 
     img {
@@ -48,22 +58,34 @@ export class InstaCard extends LitElement {
     }
 
     .author img {
-      width: 35px;
-      height: 35px;
+      width: 75px;
+      height: 75px;
       border-radius: 50%;
     }
 
     .author-name {
       font-weight: bold;
-      font-size: 14px;
+      font-size: 20px;
     }
 
     button {
-      margin-top: 8px;
       background: none;
       border: none;
-      font-size: 20px;
+      font-size: 30px;
       cursor: pointer;
+    }
+
+    .image-container {
+      width: 100%;
+      height: 450px;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
   `;
 
@@ -78,15 +100,17 @@ export class InstaCard extends LitElement {
           </div>
         ` : ""}
 
+      <div class="image-container">
         <img src="${this.image}" loading="lazy" />
-
+      </div>
         <p><strong>${this.title}</strong></p>
         <p>${this.description}</p>
 
-        <button @click="${this.toggleLike}">
-          ${this.liked ? "❤️" : "🤍"}
-        </button>
-
+        <div class="like-row">
+          <button @click="${this.toggleLike}">
+            ${this.liked ? "❤️" : "🤍"}
+          </button>
+        </div>
       </div>
     `;
   }

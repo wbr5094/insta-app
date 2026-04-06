@@ -33,6 +33,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       }
       .wrapper {
         display: flex;
+        justify-content: center;
         flex-direction: column;
         align-items: center;
         gap: var(--ddd-spacing-2);
@@ -128,6 +129,7 @@ _handleDotSelected(e) {
 
     ${this.data.length > 0 ? html`
       <insta-card
+        .id="${this.data[this.currentIndex].id}"
         .image="${this.data[this.currentIndex].fullSize}"
         .title="${this.data[this.currentIndex].name}"
         .description="${this.data[this.currentIndex].description}"
